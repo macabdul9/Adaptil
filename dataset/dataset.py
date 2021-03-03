@@ -3,7 +3,7 @@ from tqdm import tqdm
 from .SADataset import SADataset
 from torch.utils.data import DataLoader, random_split
 
-# Statement from Abdul: I intend to write a generic (task and data agnostic) dataset class but Bhatvitvya told me go through with this approach
+# Statement from Abdul: I intend to write a generic (task and data agnostic) dataset class but BHavitvya told me go through with this approach
 
 # sa data loader
 def create_sa_loaders(tokenizer, root_dir, domains =["books", "dvd", "electronics", "kitchen_housewares"], batch_size=8):
@@ -20,7 +20,6 @@ def create_sa_loaders(tokenizer, root_dir, domains =["books", "dvd", "electronic
         dataset = SADataset(tokenizer=tokenizer, file_name=d)
         
         
-        
         train_dataset, valid_dataset = random_split(dataset=dataset, lengths=[int(len(dataset)*0.80), len(dataset) - int(len(dataset)*0.20)])
         
         
@@ -34,7 +33,6 @@ def create_sa_loaders(tokenizer, root_dir, domains =["books", "dvd", "electronic
             "train":train_loader,
             "valid":valid_loader
         }
-    
     
     return loaders
 

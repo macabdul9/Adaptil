@@ -22,6 +22,8 @@ from pytorch_lightning.loggers import WandbLogger
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from dataset.dataset import DADataset
 
+from models.model import Model
+
 
 
 class LightningModel(pl.LightningModule):
@@ -31,7 +33,7 @@ class LightningModel(pl.LightningModule):
         
         self.config = config
         
-        self.model = model
+        # self.model = Model()
         self.tokenizer = AutoTokenizer.from_pretrained(config['model_name'])
         
     def forward(self, input_ids, attention_mask=None):
@@ -41,12 +43,12 @@ class LightningModel(pl.LightningModule):
     def configure_optimizers(self):
         return optim.Adam(params=self.parameters(), lr=self.config['lr'])
     
-    def train_dataloader(self):
-        # train_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_train.csv"))
-        train_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_train.csv"))
-        train_dataset = DADataset(tokenizer=self.tokenizer, data=train_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
-        train_loader = DataLoader(dataset=train_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
-        return train_loader
+    # def train_dataloader(self):
+    #     # train_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_train.csv"))
+    #     train_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_train.csv"))
+    #     train_dataset = DADataset(tokenizer=self.tokenizer, data=train_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
+    #     train_loader = DataLoader(dataset=train_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
+    #     return train_loader
     
     def training_step(self, batch, batch_idx):
         
@@ -59,12 +61,12 @@ class LightningModel(pl.LightningModule):
         wandb.log({"loss":loss, "accuracy":acc, "f1_score":f1})
         return {"loss":loss, "accuracy":acc, "f1_score":f1}
     
-    def val_dataloader(self):
-        #valid_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_valid.csv"))
-        valid_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_valid.csv")) # valid has ~40k samples this is valid is same as test to run it quickely, test has ~16k samples
-        valid_dataset = DADataset(tokenizer=self.tokenizer, data=valid_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
-        valid_loader = DataLoader(dataset=valid_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
-        return valid_loader
+    # def val_dataloader(self):
+    #     #valid_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_valid.csv"))
+    #     valid_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_valid.csv")) # valid has ~40k samples this is valid is same as test to run it quickely, test has ~16k samples
+    #     valid_dataset = DADataset(tokenizer=self.tokenizer, data=valid_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
+    #     valid_loader = DataLoader(dataset=valid_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
+    #     return valid_loader
     
     def validation_step(self, batch, batch_idx):
         input_ids, attention_mask, targets = batch['input_ids'], batch['attention_mask'], batch['label'].squeeze()
@@ -85,12 +87,12 @@ class LightningModel(pl.LightningModule):
         wandb.log({"val_loss":avg_loss, "val_accuracy":avg_acc, "val_f1":avg_f1, "val_precision":avg_precision, "val_recall":avg_recall})
         return {"val_loss":avg_loss, "val_accuracy":avg_acc, "val_f1":avg_f1, "val_precision":avg_precision, "val_recall":avg_recall}
     
-    def test_dataloader(self):
-        #test_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_test.csv"))
-        test_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_test.csv"))
-        test_dataset = DADataset(tokenizer=self.tokenizer, data=test_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
-        test_loader = DataLoader(dataset=test_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
-        return test_loader
+    # def test_dataloader(self):
+    #     #test_data = load_dataset("csv", data_files=os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_test.csv"))
+    #     test_data = pd.read_csv(os.path.join(self.config['data_dir'], self.config['dataset'], self.config['dataset']+"_test.csv"))
+    #     test_dataset = DADataset(tokenizer=self.tokenizer, data=test_data, max_len=self.config['max_len'], text_field=self.config['text_field'], label_field=self.config['label_field'])
+    #     test_loader = DataLoader(dataset=test_dataset, batch_size=self.config['batch_size'], shuffle=False, num_workers=self.config['num_workers'])
+    #     return test_loader
     
     def test_step(self, batch, batch_idx):
         input_ids, attention_mask, targets = batch['input_ids'], batch['attention_mask'], batch['label'].squeeze()
