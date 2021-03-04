@@ -73,5 +73,11 @@ def mnli_loaders(tokenizer):
     return domain_loaders
 
 
+def create_loaders(task, tokenizer):
+    if task=="sa":
+        return sa_loaders(tokenizer=tokenizer)
+    else:
+        return mnli_loaders(tokenizer=tokenizer)
+
 
 

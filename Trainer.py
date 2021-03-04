@@ -28,12 +28,12 @@ from models.model import Model
 
 class LightningModel(pl.LightningModule):
     
-    def __init__(self, model, config):
+    def __init__(self, config):
         super(LightningModel, self).__init__()
         
         self.config = config
         
-        # self.model = Model()
+        self.model = Model(model_name=)
         self.tokenizer = AutoTokenizer.from_pretrained(config['model_name'])
         
     def forward(self, input_ids, attention_mask=None):
