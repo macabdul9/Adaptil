@@ -2,7 +2,7 @@ import os
 import gc
 import json
 import torch
-
+import argparse
 
 from config import config
 from dataset.dataset import create_loaders
@@ -15,7 +15,13 @@ from Trainer import LightningModel
 
 if __name__=="__main__":
 
-    task = "sa"  # define your task here
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-t", "--Task", help="'sa' for sentiment analysis, 'mnli' for multi_nli")
+
+    args = parser.parse_args()
+
+    task = args.Task  # define your task here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results = {}
