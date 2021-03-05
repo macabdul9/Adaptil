@@ -12,6 +12,7 @@ config = {
         "mnli":{
             "num_classes":3,
             "domains":['government', 'telephone', 'fiction', 'travel', 'slate'],
+            "mismatched_domains": ['letters', 'verbatim', 'facetoface', 'oup', 'nineeleven'],
             "lr":2e-5,
             "batch_size":32,
             "epoch":5,
@@ -19,7 +20,7 @@ config = {
 
     },
     "models":['bert-base-uncased', 'distilbert-base-uncased', 'roberta-base', 'distilroberta-base'],
-    
+
     "max_seq_length": 128,
     "num_workers":4,
 
@@ -32,6 +33,6 @@ config = {
         "precision":32,
         "project":"adaptil",
     }
-    
+
 
 }
