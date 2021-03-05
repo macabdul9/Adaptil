@@ -1,5 +1,5 @@
 # import torch
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 
 def evaluate(model, loader, device):
 
@@ -16,6 +16,7 @@ def evaluate(model, loader, device):
         pred_label += outputs.cpu().detach().tolist()
         true_label += batch['label'].cpu().tolist()
 
-    macro_F1 = f1_score(y_true=true_label, y_pred=pred_label, average='macro')
+    f1 = f1_score(y_true=true_label, y_pred=pred_label, average='macro')
+    accuracy = accuracy_score(y_true=true_label, y_pred=pred_label)
 
-    return macro_F1
+    return f1, accuracy

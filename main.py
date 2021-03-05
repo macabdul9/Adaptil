@@ -1,7 +1,8 @@
 import os
-import torch
 import gc
-import pandas as pd
+import json
+import torch
+
 
 from config import config
 from dataset.dataset import create_loaders
@@ -11,12 +12,14 @@ from utils import *
 import pytorch_lightning as pl
 from transformers import AutoTokenizer
 from Trainer import LightningModel
-import torch
 
 if __name__=="__main__":
 
     task = "sa"  # define your task here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    
+    results = {}
 
     for model_name in model_list:
 
@@ -25,31 +28,53 @@ if __name__=="__main__":
 
         for source in loaders:
 
-            lm = LightningModel(model_name=model_name, config=config)
+            lm = LightningModel(model_name=model_name, config=config['tasks'][task])
 
-            path = os.path.join(os.getcwd(), "outputs", task, model_name, source)
+            # create the checkpoint path
+            PATH = os.path.join(os.getcwd(), "outputs", task, model_name)
+            os.makedirs(PATH, exist_ok=True)
+                
 
-            trainer_config = {
-                "callback_config": config['callback_config'],
-                "path": path,
-                "device": device,
-            }
+            run_name = task+"-"+model_name +"-"+source
+            
+            trainer = create_trainer(callback_config=config['callback_config'], path=PATH, run_name=run_name)
 
             train_loader, valid_loader = loaders[source]['train'], loaders[source]['valid']
 
             trainer.fit(lm, train_loader, valid_loader)
+            
+            
+            # load best checkpoint
+        
+            lm.load_from_checkpoint(PATH)
+            
+            
 
             for target in loaders:
-                # results = trainer.test(
-                #     lm,
-                #     loaders[target]['valid']
-                # )
-                true_label, pred_label, report  = evaluate(model=lm, loader=loaders[target]['valid'], device=device)  # handle source corner case
+                
+                f1, accuracy  = evaluate(model=lm, loader=loaders[target]['valid'], device=device)  # handle source corner case
 
-                if(target == source):
-                    # append source with name
 
-            # save json for that domain here
+                # save into results
+                results[model_name] = {
+                    source:{
+                        target:{
+                            "f1":f1,
+                            "accuracy":accuracy
+                        }
+                    }
+                }
+            
+            # delete model   
+            del lm
+            gc.collect()
+            torch.cuda.empty_cache() 
+            
+    
+    # save the results into json file at outputs/
+    with open(os.path.join(os.getcwd(), "outputs", "results.json"), "w") as file:
+        json.dump(results, file)
+        
 
 
 

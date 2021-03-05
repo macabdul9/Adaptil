@@ -3,17 +3,19 @@ from transformers import AutoModel, AutoConfig
 
 class Model(nn.Module):
 
-    def __init__(self, config):
+    def __init__(self, model_name, num_classes=2):
 
         super().__init__()
+        
+        self.config = AutoConfig.from_pretrained(model_name, num_labels=num_classes)
 
-        self.base_model = AutoModel.from_pretrained(configmodel)
+        self.base_model = AutoModel.from_pretrained(model_name, config=self.config)
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=config.dim, out_features=self.config.dim),
+            nn.Linear(in_features=self.config.dim, out_features=self.config.dim),
             nn.ReLU(),
             nn.Dropout(self.config.seq_classif_dropout),
-            nn.Linear(in_features=config.dim, out_features=config.dim),  # change it to config.num_labels
+            nn.Linear(in_features=self.config.dim, out_features=num_classes),  # change it to config.num_labels
         )
 
     def forward(self, input_ids, attention_mask=None):
