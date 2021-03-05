@@ -15,6 +15,9 @@ def sa_loaders(tokenizer):
     electronics.csv         1596 399
     books.csv               1590 397
     dvd.csv                 1582 396
+
+    For training, 1582 samples are used across all domains
+    For validation, 396 samples are used across all domains
     '''
 
     domain_loaders = {}
@@ -24,8 +27,8 @@ def sa_loaders(tokenizer):
 
         path_to_csv = os.path.join(os.getcwd(), "data", "amazon-review", domain+".csv")
 
-        train_dataset = load_dataset('csv', data_files=path_to_csv, split='train[:80%]')
-        val_dataset = load_dataset('csv', data_files=path_to_csv, split='train[80%:]')
+        train_dataset = load_dataset('csv', data_files=path_to_csv, split='train[:1582]')
+        val_dataset = load_dataset('csv', data_files=path_to_csv, split='train[1582:1978]')
 
         encoded_train_dataset = train_dataset.map(lambda x: tokenizer(x['review_text'], padding='max_length', truncation=True, max_length=512), batched=True)
         encoded_val_dataset = val_dataset.map(lambda x: tokenizer(x['review_text'], padding='max_length', truncation=True, max_length=512), batched=True)
@@ -74,7 +77,7 @@ def mnli_loaders(tokenizer):
 
 
 def create_loaders(task, tokenizer):
-    if task=="sa":
+    if task == "sa":
         return sa_loaders(tokenizer=tokenizer)
     else:
         return mnli_loaders(tokenizer=tokenizer)

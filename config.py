@@ -1,7 +1,4 @@
 
-import torch
-import os
-
 config = {
     "tasks":{
         "sa":{
@@ -18,18 +15,17 @@ config = {
     "batch_size": 64,
     "max_seq_length": 512,
     "num_workers":4,
-    
+
     # training
-    
-    
+
     "lr":1e-5,
     "average":"micro",
-    
+
     "training_config":{
         "monitor":"val_f1",
         "min_delta":0.001,
         "precision":32,
         "project":"adaptil",
     }
-    
+
 }
