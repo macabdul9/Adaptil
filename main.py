@@ -24,6 +24,7 @@ if __name__=="__main__":
     task = args.Task  # define your task here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    os.environ["TOKENIZERS_PARALLELISM"] = 'false'
     results = {}
 
     model_list = config["models"]
@@ -42,6 +43,8 @@ if __name__=="__main__":
 
             # create the checkpoint path
             PATH = os.path.join(os.getcwd(), "outputs", task, model_name)
+            MODEL_PATH = os.path.join(PATH, source)  # to load model
+
             os.makedirs(PATH, exist_ok=True)
 
             run_name = task+"_"+model_name +"_"+source
@@ -53,7 +56,7 @@ if __name__=="__main__":
             trainer.fit(lm, train_loader, valid_loader)
 
             # load best checkpoint
-            lm.load_from_checkpoint(PATH)
+            lm.load_from_checkpoint(MODEL_PATH)
 
             for target in loaders:
 

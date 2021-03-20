@@ -5,8 +5,8 @@ config = {
             "num_classes":2,
             "domains":["books", "dvd", "electronics", "kitchen_housewares"],
             "lr":2e-5,
-            "batch_size":2,
-            "epoch":4,
+            "batch_size":32,
+            "epochs":4,
             "average":"macro",
 
         },
@@ -16,7 +16,7 @@ config = {
             "mismatched_domains": ['letters', 'verbatim', 'facetoface', 'oup', 'nineeleven'],
             "lr":2e-5,
             "batch_size":32,
-            "epoch":5,
+            "epochs":5,
             "average":"macro",
         },
 
@@ -25,10 +25,10 @@ config = {
 
     "max_seq_length": 128,
     "num_workers":4,
-    
+
 
     "callback_config":{
-        "monitor":"val_acc",
+        "monitor":"val_accuracy",
         "min_delta":0.001,
         "patience":2,
         "precision":32,

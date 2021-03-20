@@ -26,7 +26,9 @@ def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
     )
 
     checkpoints = ModelCheckpoint(
-        filename=os.path.join(path, source+".ckpt"),
+        dirpath=path,
+        filename={source}
+        os.path.join(path, source+".ckpt"),
         monitor=callback_config["monitor"],
         save_top_k=1,
         verbose=True,
@@ -36,8 +38,7 @@ def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
 
 def create_trainer(callback_config, run_name, path):
 
-    task, model_name, source = run_name.split("-")
-
+    task, model_name, source = run_name.split("_")
 
     logger = create_logger(project=callback_config['project'], name=run_name)
 
@@ -49,7 +50,7 @@ def create_trainer(callback_config, run_name, path):
         checkpoint_callback=checkpoints,
         callbacks=[early_stopping],
         max_epochs=config['tasks'][task]["epochs"],
-        precision=config["precision"],
+        precision=config['callback_config']["precision"],
         automatic_optimization=True
     )
 
