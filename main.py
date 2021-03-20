@@ -25,8 +25,8 @@ if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results = {}
-    
-    model_list = config["models"] 
+
+    model_list = config["models"]
 
     for model_name in model_list:
 
@@ -44,7 +44,7 @@ if __name__=="__main__":
             PATH = os.path.join(os.getcwd(), "outputs", task, model_name)
             os.makedirs(PATH, exist_ok=True)
 
-            run_name = task+"-"+model_name +"-"+source
+            run_name = task+"_"+model_name +"_"+source
 
             trainer = create_trainer(callback_config=config['callback_config'], path=PATH, run_name=run_name)
 
