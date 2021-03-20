@@ -7,6 +7,7 @@ config = {
             "lr":2e-5,
             "batch_size":2,
             "epoch":4,
+            "average":"macro",
 
         },
         "mnli":{
@@ -16,6 +17,7 @@ config = {
             "lr":2e-5,
             "batch_size":32,
             "epoch":5,
+            "average":"macro",
         },
 
     },
@@ -23,8 +25,7 @@ config = {
 
     "max_seq_length": 128,
     "num_workers":4,
-
-    # training,
+    
 
     "callback_config":{
         "monitor":"val_acc",

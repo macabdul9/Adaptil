@@ -33,7 +33,7 @@ class LightningModel(pl.LightningModule):
         self.config = task_config
 
 
-        self.model = Model(model_name=model_name, num_classes=self.config['num_classes'])
+        self.model = Model(model_name=model_name, num_classes=task_config['num_classes'])
 
 
     def forward(self, input_ids, attention_mask=None):
