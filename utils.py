@@ -26,10 +26,9 @@ def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
     )
 
     checkpoints = ModelCheckpoint(
-        filepath=os.path.join(path, source+".ckpt"),
+        filename=os.path.join(path, source+".ckpt"),
         monitor=callback_config["monitor"],
         save_top_k=1,
-        save_best_only=True,
         verbose=True,
     )
 
