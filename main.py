@@ -25,6 +25,8 @@ if __name__=="__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results = {}
+    
+    model_list = config["models"] 
 
     for model_name in model_list:
 
@@ -36,7 +38,7 @@ if __name__=="__main__":
             if(len(loaders[source])!=2):
                 continue
 
-            lm = LightningModel(model_name=model_name, config=config['tasks'][task])
+            lm = LightningModel(model_name=model_name, task_config=config['tasks'][task])
 
             # create the checkpoint path
             PATH = os.path.join(os.getcwd(), "outputs", task, model_name)

@@ -5,7 +5,7 @@ config = {
             "num_classes":2,
             "domains":["books", "dvd", "electronics", "kitchen_housewares"],
             "lr":2e-5,
-            "batch_size":32,
+            "batch_size":2,
             "epoch":4,
 
         },

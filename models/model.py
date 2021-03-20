@@ -7,15 +7,15 @@ class Model(nn.Module):
 
         super().__init__()
         
-        self.config = AutoConfig.from_pretrained(model_name, num_labels=num_classes)
+        self.config = AutoConfig.from_pretrained(model_name)
 
         self.base_model = AutoModel.from_pretrained(model_name, config=self.config)
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=self.config.dim, out_features=self.config.dim),
+            nn.Linear(in_features=self.config.hidden_size, out_features=self.config.hidden_size),
             nn.ReLU(),
-            nn.Dropout(self.config.seq_classif_dropout),
-            nn.Linear(in_features=self.config.dim, out_features=num_classes),  # change it to config.num_labels
+            nn.Dropout(0.10),
+            nn.Linear(in_features=self.config.hidden_size, out_features=num_classes),  # change it to config.num_labels
         )
 
     def forward(self, input_ids, attention_mask=None):
