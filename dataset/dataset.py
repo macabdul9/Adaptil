@@ -27,8 +27,8 @@ def sa_loaders(tokenizer):
 
         path_to_csv = os.path.join(os.getcwd(), "data", "amazon-review", domain+".csv")
 
-        train_dataset = load_dataset('csv', data_files=path_to_csv, split='train[:1582]')
-        val_dataset = load_dataset('csv', data_files=path_to_csv, split='train[1582:1978]')
+        train_dataset = load_dataset('csv', data_files=path_to_csv, split='train[:80%]')
+        val_dataset = load_dataset('csv', data_files=path_to_csv, split='train[80%:]')
         
         train_dataset = train_dataset.rename_column('sentiment', 'label') 
         val_dataset = val_dataset.rename_column('sentiment', 'label')

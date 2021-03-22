@@ -1,5 +1,5 @@
 # import torch
-from sklearn.metrics import f1_score, accuracy_score
+from sklearn.metrics import f1_score, accuracy_score, classification_report
 
 def evaluate(model, loader, device):
 
@@ -18,5 +18,6 @@ def evaluate(model, loader, device):
 
     f1 = f1_score(y_true=true_label, y_pred=pred_label, average='macro')
     accuracy = accuracy_score(y_true=true_label, y_pred=pred_label)
+    cr = classification_report(y_true=true_label, y_pred=pred_label, digits=4)
 
-    return f1, accuracy
+    return f1, accuracy, cr

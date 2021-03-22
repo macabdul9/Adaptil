@@ -17,7 +17,7 @@ def create_logger(project, name):
 
 def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
 
-    task, model_name, source = run_name.split("_")
+    task, model_name, source = run_name.split("$")
 
     early_stopping = EarlyStopping(
         monitor=callback_config["monitor"],
@@ -26,9 +26,8 @@ def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
     )
 
     checkpoints = ModelCheckpoint(
-        dirpath=path,
-        filename={source}
-        os.path.join(path, source+".ckpt"),
+        # filepath=path,
+        filepath=os.path.join(path, source),
         monitor=callback_config["monitor"],
         save_top_k=1,
         verbose=True,
@@ -38,7 +37,7 @@ def create_early_stopping_and_model_checkpoint(callback_config, path, run_name):
 
 def create_trainer(callback_config, run_name, path):
 
-    task, model_name, source = run_name.split("_")
+    task, model_name, source = run_name.split("$")
 
     logger = create_logger(project=callback_config['project'], name=run_name)
 
@@ -55,3 +54,48 @@ def create_trainer(callback_config, run_name, path):
     )
 
     return trainer
+
+
+def update_results(task, model_name, source, target, f1, accuracy, results):
+    
+    if task in results.keys():
+        
+        if model_name in results[task].keys():
+            if source in results[task][model_name].keys():
+                
+                results[task][model_name][source][target] = {
+                    "f1":f1,
+                    "accuracy":accuracy
+                }
+                
+            else:
+                results[task][model_name][source] = {
+                    target:{
+                        "f1":f1,
+                        "accuracy":accuracy
+                    }
+                }
+        else:
+            results[task][model_name] = {
+                source:{
+                    target:{
+                        "f1":f1,
+                        "accuracy":accuracy
+                    }
+                }
+            }
+        
+    else:
+        results[task] = {
+            model_name:{
+                source:{
+                    target:{
+                        "f1":f1,
+                        "accuracy":accuracy
+                    }
+                }
+            }
+        }
+    
+    return results
+    

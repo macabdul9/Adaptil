@@ -4,9 +4,10 @@ config = {
         "sa":{
             "num_classes":2,
             "domains":["books", "dvd", "electronics", "kitchen_housewares"],
+            # "domains":["books"],
             "lr":2e-5,
-            "batch_size":32,
-            "epochs":4,
+            "batch_size":8,
+            "epochs":10,
             "average":"macro",
 
         },
@@ -22,6 +23,7 @@ config = {
 
     },
     "models":['bert-base-uncased', 'distilbert-base-uncased', 'roberta-base', 'distilroberta-base'],
+    # "models":['distilbert-base-uncased'],
 
     "max_seq_length": 128,
     "num_workers":4,

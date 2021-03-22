@@ -1,6 +1,8 @@
 # custom ignore
 # data/
 wandb/
+lightning_logs/
+outputs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

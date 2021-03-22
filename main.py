@@ -3,6 +3,7 @@ import gc
 import json
 import torch
 import argparse
+import tqdm
 
 from config import config
 from dataset.dataset import create_loaders
@@ -21,7 +22,7 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    task = args.Task  # define your task here
+    task = "sa" #args.Task  # define your task here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     os.environ["TOKENIZERS_PARALLELISM"] = 'false'
@@ -29,12 +30,12 @@ if __name__=="__main__":
 
     model_list = config["models"]
 
-    for model_name in model_list:
+    for model_name in tqdm.tqdm(model_list):
 
         tokenizer = AutoTokenizer.from_pretrained(model_name, usefast=True, use_lower_case=True)
         loaders = create_loaders(task=task, tokenizer=tokenizer)
 
-        for source in loaders:
+        for source in tqdm.tqdm(loaders):
 
             if(len(loaders[source])!=2):
                 continue
@@ -46,8 +47,9 @@ if __name__=="__main__":
             MODEL_PATH = os.path.join(PATH, source)  # to load model
 
             os.makedirs(PATH, exist_ok=True)
+            os.makedirs(MODEL_PATH, exist_ok=True)
 
-            run_name = task+"_"+model_name +"_"+source
+            run_name = task+"$"+model_name +"$"+source
 
             trainer = create_trainer(callback_config=config['callback_config'], path=PATH, run_name=run_name)
 
@@ -55,21 +57,33 @@ if __name__=="__main__":
 
             trainer.fit(lm, train_loader, valid_loader)
 
-            # load best checkpoint
-            lm.load_from_checkpoint(MODEL_PATH)
+            # # load best checkpoint
+            # lm.load_from_checkpoint(MODEL_PATH)
+            trainer.test(
+                model=lm,
+                test_dataloaders=valid_loader,
+                verbose=False,
+                ckpt_path="best",
+            )
+            
 
-            for target in loaders:
+            # evaluate the best model on target domains
+            for target in tqdm.tqdm(loaders):
 
-                f1, accuracy  = evaluate(model=lm, loader=loaders[target]['valid'], device=device)
-                # save into results
-                results[model_name] = {
-                    source:{
-                        target:{
-                            "f1":f1,
-                            "accuracy":accuracy
-                        }
-                    }
-                }
+                f1, accuracy, cr  = evaluate(model=lm, loader=loaders[target]['valid'], device=device)
+                
+                
+                results = update_results(
+                    task=task, 
+                    model_name=model_name,
+                    source=source,target=target, f1=f1, accuracy=accuracy, results=results
+                )
+                    
+                    
+                # save the classification report
+                # with open(os.path.join(MODEL_PATH, target+".txt"), "w") as file:
+                #     file.write(cr)
+                
 
             # delete model
             del lm
