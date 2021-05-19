@@ -1,8 +1,19 @@
 # custom ignore
-# data/
 wandb/
 lightning_logs/
 outputs/
+# results/
+representations/
+
+
+data/toxic-comments/
+data/paraphrase/
+data/amazon-review/
+data/ss2/
+data/
+
+
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
