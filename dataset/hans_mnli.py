@@ -2,44 +2,27 @@ import torch
 from datasets import load_dataset, concatenate_datasets
 import numpy as np
 
-def paraphrase_loaders(config, tokenizer, max_len=256):
+def hans_mnli_loaders(config, tokenizer, max_len=256):
 
     domains = config['domains']
 
     # which label has least number of samples in train data as well as (test)validation data in all domains
-    train_label_dist = 21829 # manually checked
-    test_label_dist =  7075 # manually checked
+    train_label_dist = 15000 # manually checked
+    test_label_dist =  6453 # manually checked
 
+    hans = load_dataset("hans")
+    mnli = load_dataset("multi_nli")
 
-    # we are  not going to take words greater than 256
-    paws = load_dataset("paws", 'labeled_final')
-    qqp = load_dataset("glue", 'qqp')
-
-
-    # # If you want to filter the data based on length | no filtering in actul experiment
-    for _, (paws_set, qqp_set) in enumerate(zip(paws.keys(), qqp.keys())):
-
-        # # applying filter
-        # paws[paws_set] = paws[paws_set].filter(lambda example : (len(example['sentence1'])+len(example['sentence2']))<=max_len)
-        # qqp[qqp_set] = qqp[qqp_set].filter(lambda example : (len(example['question1'])+len(example['question2']))<=max_len)
-
-        # both paws and qqp has difference names for 2 input sentences
-        # paws = (sentence1, sentence2) and qqp = (question1, question2) update qqp col to match paws
-
-        qqp[qqp_set] = qqp[qqp_set].rename_column('question1', 'sentence1')
-        qqp[qqp_set] = qqp[qqp_set].rename_column('question2', 'sentence2')
-
-
-    # # merge the validation and test of both datasets
-    paws['test'] = concatenate_datasets(dsets=[paws['test'], paws['validation']])
-    qqp['test'] = concatenate_datasets(dsets=[qqp['test'], qqp['validation']])
+    mnli = mnli.remove_columns(['pairID', 'promptID', 'premise_binary_parse', 'premise_parse', 'hypothesis_binary_parse', 'hypothesis_parse'])  # remove the unrelated fields
+    mnli = mnli.filter(lambda example:example['label']!=1)  # remove examples having neutral label
+    mnli['validation_matched'] = concatenate_datasets(dsets=[mnli['validation_matched'], mnli['validation_mismatched']])
 
     datasets = {
-        "paws":paws,
-        "qqp":qqp
+        "hans":hans,
+        "mnli":mnli
     }
 
-    labels = list(set(qqp['train']['label']))
+    labels = list(set(hans['train']['label']))
 
     domain_dsets = {}
     for domain in domains:
@@ -51,17 +34,20 @@ def paraphrase_loaders(config, tokenizer, max_len=256):
 
     # take equal numbe of samples for each domain for each label for each set
     for label in labels:
-
         for domain in domain_dsets:
 
+            if domain == "mnli" and label == 1:
+                label = 2  # we don't have label 1 incase of mnli as it means "neutral"
+
             train = datasets[domain]['train'].filter(lambda example:example['label']==label).shuffle(seed=42).select(range(train_label_dist))
-            test = datasets[domain]['test'].filter(lambda example:example['label']==label).shuffle(seed=42).select(range(test_label_dist))
+
+            if domain == "mnli":
+                test = datasets[domain]['validation_matched'].filter(lambda example:example['label']==label).shuffle(seed=42).select(range(test_label_dist))
+            else:
+                test = datasets[domain]['validation'].filter(lambda example:example['label']==label).shuffle(seed=42).select(range(test_label_dist))
 
             domain_dsets[domain]['train'].append(train)
             domain_dsets[domain]['test'].append(test)
-
-
-
 
 
     # concatenate the dataset and shuffle them
@@ -72,12 +58,9 @@ def paraphrase_loaders(config, tokenizer, max_len=256):
         domain_dsets[domain]['train'] = concatenate_datasets(dsets=domain_dsets[domain]['train']).shuffle(seed=42)
         domain_dsets[domain]['test'] = concatenate_datasets(dsets=domain_dsets[domain]['test']).shuffle(seed=42)
 
-
         # # tokenize
-        domain_dsets[domain]['train'] = domain_dsets[domain]['train'].map(lambda x: tokenizer(x['sentence1'], x['sentence2'], padding='max_length', truncation=True, max_length=config['max_seq_length']), batched=True)
-        domain_dsets[domain]['test'] = domain_dsets[domain]['test'].map(lambda x: tokenizer(x['sentence1'], x['sentence2'], padding='max_length', truncation=True, max_length=config['max_seq_length']), batched=True)
-
-
+        domain_dsets[domain]['train'] = domain_dsets[domain]['train'].map(lambda x: tokenizer(x['premise'], x['hypothesis'], padding='max_length', truncation=True, max_length=config['max_seq_length']), batched=True)
+        domain_dsets[domain]['test'] = domain_dsets[domain]['test'].map(lambda x: tokenizer(x['premise'], x['hypothesis'], padding='max_length', truncation=True, max_length=config['max_seq_length']), batched=True)
 
         # change the dtype
         domain_dsets[domain]['train'].set_format(type='torch', columns=['input_ids', 'attention_mask', 'label'])
@@ -89,12 +72,9 @@ def paraphrase_loaders(config, tokenizer, max_len=256):
         domain_dsets[domain]['valid'] = domain_dsets[domain]['test'] # validation and test will be same
 
 
-
-
     # why the hell I am doing this?
+    # we all are seeking the same answer from our lives.
     loaders = domain_dsets
-
-
     return loaders
 
 

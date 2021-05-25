@@ -5,7 +5,7 @@ import numpy as np
 def imdb_sst2_loaders(config, tokenizer):
 
     """
-        We have to ensure that sample size as well label distribution remains uniform across the distribution and set. 
+        We have to ensure that sample size as well label distribution remains uniform across the distribution and set.
     """
 
     sst2 = load_dataset("toriving/sst2") # sst2 has train, valid and test. We're mering test and valid set into test set
@@ -13,11 +13,11 @@ def imdb_sst2_loaders(config, tokenizer):
 
     # try this if ood problem does not get fixed load_dataset("toriving/imdb")
 
-    sst2_train = sst2['train'].shuffle()
-    sst2_test = concatenate_datasets([sst2['validation'], sst2['test']]).shuffle()
+    sst2_train = sst2['train'].shuffle(seed=42)
+    sst2_test = concatenate_datasets([sst2['validation'], sst2['test']]).shuffle(seed=42)
 
-    imdb_train = imdb['train'].shuffle()
-    imdb_test = imdb['test'].shuffle()
+    imdb_train = imdb['train'].shuffle(seed=42)
+    imdb_test = imdb['test'].shuffle(seed=42)
 
 
     train_label_values = []
@@ -25,24 +25,24 @@ def imdb_sst2_loaders(config, tokenizer):
 
     labels = np.unique(sst2_train['label']).tolist()
 
-    for label in labels: # assuming that there's no label shift 
+    for label in labels: # assuming that there's no label shift
 
         # min number of samples of label in  both dataset  in train dataset
         train_min = min(len(sst2_train.filter(lambda example: example['label'] == int(label))), len(imdb_train.filter(lambda example: example['label'] == int(label))))
-        
+
         train_label_values.append(train_min)
 
         # min number of samples of label in  both dataset  in test dataset
         test_min = min(len(sst2_test.filter(lambda example: example['label'] == int(label))), len(imdb_test.filter(lambda example: example['label'] == int(label))))
         test_label_values.append(test_min)
-    
+
 
     train_label_dist = min(train_label_values)
-    
+
     test_label_dist = min(test_label_values)
 
 
-    ## 
+    ##
     dsets = {
 
         "sst2":{
@@ -59,13 +59,13 @@ def imdb_sst2_loaders(config, tokenizer):
 
     for label in labels:
 
-        sst2_train_label = sst2_train.shuffle().filter(lambda example: example['label']==int(label)).select(range(train_label_dist))
+        sst2_train_label = sst2_train.shuffle(seed=42).filter(lambda example: example['label']==int(label)).select(range(train_label_dist))
 
-        sst2_test_label = sst2_test.shuffle().filter(lambda example: example['label']==int(label)).select(range(test_label_dist))
+        sst2_test_label = sst2_test.shuffle(seed=42).filter(lambda example: example['label']==int(label)).select(range(test_label_dist))
 
-        imdb_train_label = imdb_train.shuffle().filter(lambda example: example['label']==int(label)).select(range(train_label_dist))
+        imdb_train_label = imdb_train.shuffle(seed=42).filter(lambda example: example['label']==int(label)).select(range(train_label_dist))
 
-        imdb_test_label = imdb_test.shuffle().filter(lambda example: example['label']==int(label)).select(range(test_label_dist))
+        imdb_test_label = imdb_test.shuffle(seed=42).filter(lambda example: example['label']==int(label)).select(range(test_label_dist))
 
 
         dsets['sst2']['train'].append(sst2_train_label)
@@ -73,19 +73,19 @@ def imdb_sst2_loaders(config, tokenizer):
 
         dsets['imdb']['train'].append(imdb_train_label)
         dsets['imdb']['test'].append(imdb_test_label)
-        
+
 
     ## split the data based on sample distribution as well as label distribution
-    sst2_train = concatenate_datasets(dsets=dsets['sst2']['train']).shuffle()
-    sst2_test = concatenate_datasets(dsets=dsets['sst2']['test']).shuffle()
+    sst2_train = concatenate_datasets(dsets=dsets['sst2']['train']).shuffle(seed=42)
+    sst2_test = concatenate_datasets(dsets=dsets['sst2']['test']).shuffle(seed=42)
 
-    imdb_train = concatenate_datasets(dsets=dsets['imdb']['train']).shuffle()
-    imdb_test = concatenate_datasets(dsets=dsets['imdb']['test']).shuffle()
+    imdb_train = concatenate_datasets(dsets=dsets['imdb']['train']).shuffle(seed=42)
+    imdb_test = concatenate_datasets(dsets=dsets['imdb']['test']).shuffle(seed=42)
 
 
     # tokenize the dataset
 
-    # this can be done with loop but who cares 
+    # this can be done with loop but who cares
 
     # sst2
     # train

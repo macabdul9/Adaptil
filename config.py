@@ -11,7 +11,7 @@ config = {
             "epochs":10,
             "average":"macro",
             "max_seq_length": 128,
-            
+
 
         },
         "imdb_sst2_sa":{
@@ -21,10 +21,10 @@ config = {
             "batch_size":32, # 2 for test actul is 8, # large sequence length hence smaller batch size
             "epochs":5, # 1 for testing actual is 10,
             "average":"macro",
-            "max_seq_length": 512, # imdb have lengthy reviews 
+            "max_seq_length": 512, # imdb have lengthy reviews
         },
-        
-        
+
+
         "mnli":{
             "num_classes":3,
             "domains":['government', 'telephone', 'fiction', 'travel', 'slate'],
@@ -34,7 +34,7 @@ config = {
             "average":"macro",
             "max_seq_length": 128,
         },
-        
+
         "paraphrase":{
             "num_classes":2,
             "domains":['qqp', 'paws'], # "mrpc"
@@ -44,7 +44,7 @@ config = {
             "average":"macro",
             "max_seq_length": 256,
         },
-        
+
         "toxic-comments":{
             "num_classes":2,
             "domains":['male',
@@ -56,7 +56,18 @@ config = {
                         'black',
                         'white'],
             "batch_size":32,
-            
+
+        },
+
+        "hans_mnli":{
+            "num_classes":2,
+            "domains":['hans',
+                        'mnli'],
+            "lr":2e-5,
+            "batch_size":32,
+            "epochs":10,
+            "average":"macro",
+            "max_seq_length": 256,
         }
 
     },
@@ -65,7 +76,7 @@ config = {
 
     # "max_seq_length": 128, # moved to respective task section
     "num_workers":4,
-    
+
     'freeze':1/2, # 1/2 means half of total(6 if there are 12, 3 if there are 6), 1/3 means one third(4 if 12 2 if 6)
 
 
