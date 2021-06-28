@@ -22,7 +22,7 @@ Results:
 ### Sentiment Analysis (IMDB-SST2)
 
  ![alt text](/assets/imdb_sst2-sa/iid-vs-ood.png "Paraphrase IID vs OOD")
- ![alt text](/assets/imdb_sst2-sa/iid-vs-ood.png "Sentiment Analysis IID vs OOD")
+ ![alt text](/assets/imdb_sst2-sa/pd.png "Sentiment Analysis IID vs OOD")
 
  
 
