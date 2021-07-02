@@ -1,6 +1,6 @@
 # Adaptil
 Investigating the Domain Robustness of Distilled Models and Pre-training models. 
-Most of the experiment in this repo was presented in [Pretrained Transformers Improve Out-of-Distribution Robustness](https://arxiv.org/abs/2004.06100).
+Most of the experiment in this repo was presented in [Pretrained Transformers Improve Out-of-Distribution Robustness](https://arxiv.org/abs/2004.06100). Did not train models for few tasks due to minimal shift in distribution.
 
 ## Tasks and Domains:
 - Sentiment Analysis (IMDB, SST2)
